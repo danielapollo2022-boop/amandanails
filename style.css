@@ -379,10 +379,11 @@ h1, h2, h3, .logo, .services-table th {
     font-size: 1.1rem;
 }
 
-/* --- NOVO: GRADE DO INSTAGRAM --- */
+/* --- NOVO: GRADE DO INSTAGRAM INTELIGENTE --- */
 .instagram-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 colunas desktop */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 15px;
     margin-top: 1rem;
 }
@@ -391,9 +392,12 @@ h1, h2, h3, .logo, .services-table th {
     position: relative;
     display: block;
     overflow: hidden;
-    aspect-ratio: 1 / 1; /* Garante quadrado perfeito */
+    /* Tamanho padrão Desktop */
+    width: 220px; 
+    height: 220px;
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* Impede que encolham */
 }
 
 .insta-item img {
@@ -694,9 +698,27 @@ footer { margin-top: 4rem; }
     .shape-img-wrapper { width: 60px; height: 60px; }
     .shape-item span { font-size: 0.9rem; }
     
-    /* Instagram Mobile */
+    /* --- INSTAGRAM MOBILE (CARROSSEL) --- */
+    /* Aqui acontece a mágica: transformamos a grade em um slider */
     .instagram-grid { 
-        grid-template-columns: repeat(2, 1fr); /* 2 colunas no celular */
-        gap: 10px;
+        display: flex;
+        flex-wrap: nowrap !important; /* Força uma linha só */
+        overflow-x: auto; /* Permite rolar para o lado */
+        justify-content: flex-start; /* Alinha no começo */
+        padding-bottom: 10px; /* Espaço para o dedo não cobrir a foto */
+        -webkit-overflow-scrolling: touch; /* Rolagem suave no iPhone */
+        scroll-snap-type: x mandatory; /* Faz a foto "grudar" ao rolar */
+    }
+
+    .insta-item {
+        width: 160px; /* Tamanho menor no celular */
+        height: 160px;
+        scroll-snap-align: center; /* Centraliza a foto ao parar de rolar */
+        margin-right: 5px;
+    }
+    
+    /* Esconder a barra de rolagem (Visual mais limpo) */
+    .instagram-grid::-webkit-scrollbar {
+        display: none;
     }
 }
