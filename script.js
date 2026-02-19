@@ -212,7 +212,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const dadosAgendamento = {
                 nome: document.getElementById('name').value,
-                telefone: document.getElementById('phone').value,
+    // Esta linha abaixo remove tudo que não for número antes de enviar para o email
+                telefone: document.getElementById('phone').value.replace(/\D/g, ''), 
                 servico: document.getElementById('service').value,
                 data: selectedDateValue,       
                 data_visual: selectedDateVisual, 
@@ -221,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                await emailjs.send('service_8h57c56', 'template_zpokwji', dadosAgendamento);
+                await emailjs.send('service_8h57c56', 'template_tnodhe4', dadosAgendamento);
                 const { collection, addDoc } = window.firestoreTools;
                 await addDoc(collection(window.db, "agendamentos"), dadosAgendamento);
 
