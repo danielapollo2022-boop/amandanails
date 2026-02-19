@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                await emailjs.send('service_8h57c56', 'template_tnodhe4', dadosAgendamento);
+                await emailjs.send('service_91l5vat', 'template_tnodhe4', dadosAgendamento);
                 const { collection, addDoc } = window.firestoreTools;
                 await addDoc(collection(window.db, "agendamentos"), dadosAgendamento);
 
