@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarAgendaDoDia() {
         if (!timeGrid || !selectedDateValue) return;
-        timeGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.7;">Verificando disponibilidade...</p>';
+        timeGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.7;">A verificar disponibilidade...</p>';
 
         try {
             const { collection, getDocs, query, where } = window.firestoreTools;
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const btnSubmit = bookingForm.querySelector('button[type="submit"]');
             const originalText = btnSubmit.innerText;
-            btnSubmit.innerText = 'Processando...';
+            btnSubmit.innerText = 'A processar...';
             btnSubmit.disabled = true;
 
             const dadosAgendamento = {
@@ -241,10 +241,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ======================================================
+    // 4. CARREGAR GALERIA DE FOTOS DINÂMICA
+    // ======================================================
+    async function carregarGaleria() {
+        const galeriaContainer = document.getElementById('galeria-dinamica');
+        if (!galeriaContainer) return;
+
+        try {
+            const { collection, getDocs, query, orderBy } = window.firestoreTools;
+            const db = window.db;
+
+            // Busca as fotos ordenando da mais recente para a mais antiga
+            const q = query(collection(db, "galeria"), orderBy("data_upload", "desc"));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                galeriaContainer.innerHTML = '<p style="font-size: 1.2rem; opacity: 0.7;">Nenhuma fotografia foi encontrada.</p>';
+                return;
+            }
+
+            galeriaContainer.innerHTML = ''; // Limpa a mensagem padrão
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                
+                // Reaproveita as classes CSS para o Instagram Grid
+                const itemHTML = `
+                    <a href="${data.url}" target="_blank" class="insta-item">
+                        <img src="${data.url}" alt="Nail Art Amanda Nails">
+                        <div class="insta-overlay">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                    </a>
+                `;
+                galeriaContainer.innerHTML += itemHTML;
+            });
+        } catch (error) {
+            console.error("Erro ao carregar a galeria:", error);
+            galeriaContainer.innerHTML = '<p style="color: red;">Erro ao carregar as fotografias.</p>';
+        }
+    }
+
     // Inicialização
     renderizarDatas();     
     setTimeout(carregarAgendaDoDia, 500); 
     carregarTabelaPrecos(); 
+    carregarGaleria(); // Adicionado aqui para executar na abertura da página
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {

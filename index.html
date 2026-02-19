@@ -125,7 +125,7 @@
             <div style="text-align: center; margin-bottom: 2rem; margin-top: 4rem;">
                 <h2 class="section-title" style="margin-bottom: 0.5rem; font-size: 2rem;">#VenhaConhecer</h2>
                 <p class="section-subtitle">
-                    Acompanhe nossos trabalhos recentes no Instagram 
+                    Acompanhe os nossos trabalhos recentes no Instagram 
                     <a href="https://instagram.com/amandafigueiredo.nails" target="_blank" style="color: var(--accent-color); font-weight: bold; text-decoration: none;">
                         @amandafigueiredo.nails
                     </a>
@@ -133,7 +133,7 @@
             </div>
 
             <div class="instagram-grid" id="galeria-dinamica" style="display: flex; justify-content: center; align-items: center; min-height: 100px;">
-                <p style="font-size: 1.2rem; opacity: 0.7;">Nenhuma foto foi encontrada.</p>
+                <p style="font-size: 1.2rem; opacity: 0.7;">A carregar galeria...</p>
             </div>
 
         </div>
@@ -154,7 +154,7 @@
                     </thead>
                     <tbody id="tabela-precos-dinamica">
                         <tr>
-                            <td colspan="2" style="text-align: center; opacity: 0.6;">Sincronizando tabela...</td>
+                            <td colspan="2" style="text-align: center; opacity: 0.6;">A sincronizar tabela...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -174,7 +174,7 @@
                 <form id="booking-form">
                     <div class="input-group">
                         <label for="name">Nome Completo</label>
-                        <input type="text" id="name" placeholder="Seu nome" required>
+                        <input type="text" id="name" placeholder="O seu nome" required>
                     </div>
                     <div class="input-group">
                         <label for="phone">WhatsApp</label>
@@ -243,7 +243,6 @@
       const db = getFirestore(app);
 
       window.db = db;
-      // IMPORTANTE: orderBy precisa estar aqui
       window.firestoreTools = { collection, addDoc, getDocs, query, where, orderBy };
     </script>
 
