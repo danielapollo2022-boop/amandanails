@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Amanda Nails</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        body { padding-top: 50px; }
+        .admin-container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+        .service-item-admin { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 1rem; border-bottom: 1px solid var(--glass-border); 
+        }
+        .btn-delete { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .admin-form { margin-bottom: 3rem; display: grid; gap: 10px; }
+        .admin-form input, .admin-form label { font-size: 1rem; }
+        .status-msg { text-align: center; margin: 10px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <div class="container admin-container glass-card">
+        
+        <h1 style="font-family: 'Playfair Display'; margin-bottom: 1rem;">Gerenciar Preços</h1>
+        
+        <form id="add-service-form" class="admin-form">
+            <div class="input-group">
+                <label>Nome do Serviço</label>
+                <input type="text" id="admin-nome" placeholder="Ex: Alongamento em Gel" required>
+            </div>
+            <div class="input-group">
+                <label>Preço (R$)</label>
+                <input type="text" id="admin-preco" placeholder="Ex: 150,00" required>
+            </div>
+            <div class="input-group">
+                <label>Ordem de exibição</label>
+                <input type="number" id="admin-ordem" placeholder="Ex: 1" required>
+            </div>
+            <div class="input-group" style="flex-direction: row; align-items: center; gap: 10px;">
+                <input type="checkbox" id="admin-popular" style="width: auto;">
+                <label for="admin-popular" style="margin: 0;">Marcar como "Popular"?</label>
+            </div>
+            <button type="submit" class="btn-primary">Adicionar Serviço</button>
+        </form>
+
+        <h2>Serviços Atuais</h2>
+        <div id="admin-lista-servicos" style="margin-bottom: 3rem;">
+            <p>Carregando lista...</p>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlsJiWRJ1GfKDyKu0AFVvUM4_3-4WuEes",
+            authDomain: "amanda-nails-11f7b.firebaseapp.com",
+            projectId: "amanda-nails-11f7b",
+            storageBucket: "amanda-nails-11f7b.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ELEMENTOS DO DOM
+        const listaServicos = document.getElementById('admin-lista-servicos');
+        const addServiceForm = document.getElementById('add-service-form');
+        
+        // ========================
+        // 1. LÓGICA DE SERVIÇOS
+        // ========================
+        async function carregarServicos() {
+            listaServicos.innerHTML = '<p>Atualizando...</p>';
+            const q = query(collection(db, "servicos"), orderBy("ordem", "asc"));
+            const snapshot = await getDocs(q);
+            
+            listaServicos.innerHTML = '';
+            snapshot.forEach((servico) => {
+                const data = servico.data();
+                const div = document.createElement('div');
+                div.className = 'service-item-admin';
+                div.innerHTML = `
+                    <div>
+                        <strong>${data.nome}</strong> - R$ ${data.preco} 
+                        ${data.popular ? '<span class="badge">Popular</span>' : ''}
+                    </div>
+                    <button class="btn-delete" onclick="deletarItem('servicos', '${servico.id}')">Excluir</button>
+                `;
+                listaServicos.appendChild(div);
+            });
+        }
+
+        addServiceForm.onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, "servicos"), {
+                    nome: document.getElementById('admin-nome').value,
+                    preco: document.getElementById('admin-preco').value,
+                    ordem: Number(document.getElementById('admin-ordem').value),
+                    popular: document.getElementById('admin-popular').checked
+                });
+                addServiceForm.reset();
+                carregarServicos();
+            } catch (err) {
+                alert("Erro ao salvar serviço!");
+                console.error(err);
+            }
+        };
+
+        // ========================
+        // 3. FUNÇÃO GLOBAL DELETAR
+        // ========================
+        window.deletarItem = async (colecao, id) => {
+            if(confirm("Deseja realmente excluir este item?")) {
+                try {
+                    await deleteDoc(doc(db, colecao, id));
+                    if(colecao === 'servicos') carregarServicos();
+                } catch (err) {
+                    alert("Erro ao excluir.");
+                    console.error(err);
+                }
+            }
+        }
+
+        // Inicializar
+        carregarServicos();
+    </script>
+</body>
+</html>

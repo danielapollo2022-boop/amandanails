@@ -1,10 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ======================================================
-    // 1. TEMA (DARK/LIGHT MODE) E MENU MOBILE (VISUAL)
+    // 1. TEMA E MENU MOBILE (VISUAL)
     // ======================================================
-    
-    // --- Lógica do Tema ---
     const themeToggleBtn = document.getElementById('theme-toggle');
     const htmlElement = document.documentElement;
     const icon = themeToggleBtn.querySelector('i');
@@ -33,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Menu Mobile ---
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
 
@@ -56,51 +53,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ======================================================
-    // 2. SISTEMA DE AGENDAMENTO INTELIGENTE (DATAS + FIREBASE)
+    // 2. TABELA DE PREÇOS DINÂMICA
     // ======================================================
+    async function carregarTabelaPrecos() {
+        const tabela = document.getElementById('tabela-precos-dinamica');
+        if (!tabela) return;
 
+        try {
+            const { collection, getDocs, query, orderBy } = window.firestoreTools;
+            const db = window.db;
+
+            const q = query(collection(db, "servicos"), orderBy("ordem", "asc"));
+            const querySnapshot = await getDocs(q);
+            
+            tabela.innerHTML = ''; 
+
+            if (querySnapshot.empty) {
+                tabela.innerHTML = '<tr><td colspan="2" style="text-align: center;">Nenhum serviço disponível.</td></tr>';
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const item = doc.data();
+                const badge = item.popular ? '<span class="badge">Popular</span>' : '';
+                
+                const row = `
+                    <tr>
+                        <td>${item.nome} ${badge}</td>
+                        <td>R$ ${item.preco}</td>
+                    </tr>
+                `;
+                tabela.innerHTML += row;
+            });
+        } catch (error) {
+            console.error("Erro ao carregar preços:", error);
+            tabela.innerHTML = '<tr><td colspan="2" style="text-align: center; color: red;">Erro ao carregar os valores.</td></tr>';
+        }
+    }
+
+    // ======================================================
+    // 3. SISTEMA DE AGENDAMENTO (DATAS + FIREBASE)
+    // ======================================================
     const timeGrid = document.getElementById('time-grid');
     const dateContainer = document.getElementById('date-scroll');
     const bookingForm = document.getElementById('booking-form');
     const bookingConfirmation = document.getElementById('booking-confirmation');
     const selectedTimeDisplay = document.getElementById('selected-time');
 
-    // Variáveis para guardar a escolha do usuário
-    let selectedDateValue = null; // Formato: YYYY-MM-DD
-    let selectedDateVisual = null; // Formato: DD/MM
-    let selectedTimeValue = null; // Formato: HH:00
+    let selectedDateValue = null; 
+    let selectedDateVisual = null; 
+    let selectedTimeValue = null; 
 
-    // --- FUNÇÃO A: Gerar o Carrossel de Datas ---
     function renderizarDatas() {
         if (!dateContainer) return;
-
-        dateContainer.innerHTML = ''; // Limpa antes de gerar
+        dateContainer.innerHTML = ''; 
         const hoje = new Date();
         let diasGerados = 0;
         
-        // Gera os próximos dias até completar 10 opções válidas
         for (let i = 0; diasGerados < 10; i++) {
             const dataFutura = new Date(hoje);
             dataFutura.setDate(hoje.getDate() + i);
-
-            // Se for Domingo (0), pula
             if (dataFutura.getDay() === 0) continue;
 
-            // Formata data para o Banco (YYYY-MM-DD)
             const ano = dataFutura.getFullYear();
             const mes = (dataFutura.getMonth() + 1).toString().padStart(2, '0');
             const dia = dataFutura.getDate().toString().padStart(2, '0');
             const dataIso = `${ano}-${mes}-${dia}`;
-
-            // Formata data para o Usuário ver (Dia da semana + DD/MMM)
             const diaSemana = dataFutura.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
             const dataCurta = dataFutura.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
 
-            // Cria o elemento HTML do dia
             const card = document.createElement('div');
             card.classList.add('date-card');
             
-            // Seleciona o primeiro dia automaticamente
             if (diasGerados === 0 && !selectedDateValue) {
                 card.classList.add('selected');
                 selectedDateValue = dataIso;
@@ -109,18 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             card.innerHTML = `<span>${diaSemana}</span><strong>${dataCurta}</strong>`;
 
-            // Clique no dia
             card.addEventListener('click', () => {
-                // Remove seleção dos outros
                 document.querySelectorAll('.date-card').forEach(d => d.classList.remove('selected'));
                 card.classList.add('selected');
-                
-                // Atualiza variáveis
                 selectedDateValue = dataIso;
                 selectedDateVisual = dataCurta;
-                selectedTimeValue = null; // Reseta o horário ao trocar de dia
-                
-                // Esconde confirmação antiga e recarrega agenda
+                selectedTimeValue = null; 
                 if(bookingConfirmation) bookingConfirmation.classList.add('hidden');
                 carregarAgendaDoDia();
             });
@@ -130,18 +148,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- FUNÇÃO B: Buscar Horários no Firebase ---
     async function carregarAgendaDoDia() {
         if (!timeGrid || !selectedDateValue) return;
-
-        // Mostra "Carregando..."
         timeGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.7;">Verificando disponibilidade...</p>';
 
         try {
             const { collection, getDocs, query, where } = window.firestoreTools;
             const db = window.db;
 
-            // BUSCA FILTRADA: Traz apenas agendamentos da data selecionada
             const q = query(
                 collection(db, "agendamentos"), 
                 where("data", "==", selectedDateValue)
@@ -149,12 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const querySnapshot = await getDocs(q);
             const horariosOcupados = [];
-            
-            querySnapshot.forEach((doc) => {
-                horariosOcupados.push(doc.data().horario);
-            });
+            querySnapshot.forEach((doc) => horariosOcupados.push(doc.data().horario));
 
-            // Renderiza os botões de horário
             timeGrid.innerHTML = '';
             const startHour = 9;
             const endHour = 19;
@@ -164,20 +174,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const button = document.createElement('div');
                 
                 if (horariosOcupados.includes(timeString)) {
-                    // OCUPADO
                     button.innerText = "Ocupado";
                     button.classList.add('time-slot', 'ocupado');
                 } else {
-                    // LIVRE
                     button.innerText = timeString;
                     button.classList.add('time-slot');
-                    
                     button.addEventListener('click', function() {
                         document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
                         this.classList.add('selected');
-                        
                         selectedTimeValue = timeString;
-
                         if (bookingConfirmation) {
                             bookingConfirmation.classList.remove('hidden');
                             selectedTimeDisplay.innerText = `${selectedDateVisual} às ${timeString}`;
@@ -186,18 +191,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 timeGrid.appendChild(button);
             }
-
         } catch (error) {
             console.error("Erro ao carregar agenda:", error);
             timeGrid.innerHTML = '<p style="color: red;">Erro ao conectar com a agenda.</p>';
         }
     }
 
-    // --- FUNÇÃO C: Enviar Formulário (Email + Firebase) ---
     if (bookingForm) {
         bookingForm.addEventListener('submit', async function(event) {
             event.preventDefault();
-
             if (!selectedTimeValue || !selectedDateValue) {
                 alert("Por favor, selecione um DIA e um HORÁRIO.");
                 return;
@@ -212,33 +214,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 nome: document.getElementById('name').value,
                 telefone: document.getElementById('phone').value,
                 servico: document.getElementById('service').value,
-                data: selectedDateValue,       // Salva: 2026-02-18
-                data_visual: selectedDateVisual, // Salva: 18 Fev
+                data: selectedDateValue,       
+                data_visual: selectedDateVisual, 
                 horario: selectedTimeValue,
                 criado_em: new Date().toISOString()
             };
 
             try {
-                // 1. Envia E-mail (EmailJS)
-                // Dica: No seu template do EmailJS, use {{data_visual}} para mostrar o dia bonito
                 await emailjs.send('service_8h57c56', 'template_zpokwji', dadosAgendamento);
-
-                // 2. Salva no Firebase
                 const { collection, addDoc } = window.firestoreTools;
                 await addDoc(collection(window.db, "agendamentos"), dadosAgendamento);
 
-                // Sucesso
                 alert(`Agendamento confirmado para ${selectedDateVisual} às ${selectedTimeValue}!`);
-                
-                // Reset visual
                 bookingForm.reset();
                 bookingConfirmation.classList.add('hidden');
                 selectedTimeValue = null;
                 document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
-                
-                // Atualiza a agenda para bloquear o horário que acabou de ser pego
                 carregarAgendaDoDia();
-
             } catch (err) {
                 console.error('Erro no envio:', err);
                 alert('Houve um erro ao agendar. Tente novamente.');
@@ -249,29 +241,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ======================================================
-    // 3. INICIALIZAÇÃO E UTILITÁRIOS
-    // ======================================================
+    // Inicialização
+    renderizarDatas();     
+    setTimeout(carregarAgendaDoDia, 500); 
+    carregarTabelaPrecos(); 
 
-    // Inicia o sistema
-    renderizarDatas();     // Cria os dias
-    setTimeout(carregarAgendaDoDia, 500); // Carrega horários do primeiro dia
-
-    // Smooth Scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
             const targetElement = document.querySelector(targetId);
-
             if (targetElement) {
-                if (window.innerWidth <= 768 && navLinks) {
-                    navLinks.style.display = 'none';
-                }
+                if (window.innerWidth <= 768 && navLinks) navLinks.style.display = 'none';
                 targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
     });
-
-    console.log("%c Amanda Nails - Sistema Online ", "background: #E7B8B1; color: #fff; padding: 5px; border-radius: 5px;");
 });

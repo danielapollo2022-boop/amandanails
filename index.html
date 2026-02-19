@@ -19,7 +19,7 @@
     <script type="text/javascript">
        (function(){
           emailjs.init({
-            publicKey: "1QZH3CYbudW1XwC5D", // <--- CONFIRA SE SUA PUBLIC KEY ESTÁ CERTA
+            publicKey: "1QZH3CYbudW1XwC5D", 
           });
        })();
     </script>
@@ -132,33 +132,8 @@
                 </p>
             </div>
 
-            <div class="instagram-grid">
-                
-                <a href="https://www.instagram.com/p/DS7ixLMjiEJ/" target="_blank" class="insta-item">
-                    <img src="img/insta1.jpg" alt="Unha Instagram 1">
-                    <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
-                </a>
-
-                <a href="https://www.instagram.com/p/DSBUjaxERGV/" target="_blank" class="insta-item">
-                    <img src="img/insta2.jpg" alt="Unha Instagram 2">
-                    <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
-                </a>
-
-                <a href="https://www.instagram.com/p/DP7ZXnmkZuD/" target="_blank" class="insta-item">
-                    <img src="img/insta3.jpg" alt="Unha Instagram 3">
-                    <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
-                </a>
-
-                <a href="https://www.instagram.com/p/DPPifuSkcpZ/?img_index=1" target="_blank" class="insta-item">
-                    <img src="img/insta4.jpg" alt="Unha Instagram 4">
-                    <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
-                </a>
-
-                 <a href="https://www.instagram.com/p/DNwWY9D4kn2/" target="_blank" class="insta-item">
-                    <img src="img/insta5.jpg" alt="Unha Instagram 5">
-                    <div class="insta-overlay"><i class="fab fa-instagram"></i></div>
-                </a>
-
+            <div class="instagram-grid" id="galeria-dinamica" style="display: flex; justify-content: center; align-items: center; min-height: 100px;">
+                <p style="font-size: 1.2rem; opacity: 0.7;">Nenhuma foto foi encontrada.</p>
             </div>
 
         </div>
@@ -177,30 +152,9 @@
                             <th>Investimento</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tabela-precos-dinamica">
                         <tr>
-                            <td>Alongamento Fibra de Vidro <span class="badge">Popular</span></td>
-                            <td>R$ 220,00</td>
-                        </tr>
-                        <tr>
-                            <td>Manutenção (Fibra/Gel)</td>
-                            <td>R$ 150,00</td>
-                        </tr>
-                        <tr>
-                            <td>Banho de Gel Premium</td>
-                            <td>R$ 120,00</td>
-                        </tr>
-                        <tr>
-                            <td>Blindagem de Diamante</td>
-                            <td>R$ 90,00</td>
-                        </tr>
-                        <tr>
-                            <td>Nail Art Complexa (Encapsulada/Jóias)</td>
-                            <td>R$ 50,00</td>
-                        </tr>
-                        <tr>
-                            <td>Spa dos Pés e Mãos</td>
-                            <td>R$ 110,00</td>
+                            <td colspan="2" style="text-align: center; opacity: 0.6;">Sincronizando tabela...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -273,11 +227,9 @@
     </footer>
 
     <script type="module">
-      // Importa query e where, necessários para filtrar por data
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-      // COLE AQUI OS SEUS DADOS DO FIREBASE (Vá na engrenagem -> Configurações do Projeto)
       const firebaseConfig = {
         apiKey: "AIzaSyBlsJiWRJ1GfKDyKu0AFVvUM4_3-4WuEes",
         authDomain: "amanda-nails-11f7b.firebaseapp.com",
@@ -287,13 +239,12 @@
         appId: "SEU_APP_ID"
       };
 
-      // Inicializa Firebase
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // Exporta para o script.js usar (incluindo query e where agora!)
       window.db = db;
-      window.firestoreTools = { collection, addDoc, getDocs, query, where };
+      // IMPORTANTE: orderBy precisa estar aqui
+      window.firestoreTools = { collection, addDoc, getDocs, query, where, orderBy };
     </script>
 
     <script src="script.js"></script>
