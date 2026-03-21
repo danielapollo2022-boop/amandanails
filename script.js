@@ -104,9 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedDateVisual = null; 
     let selectedTimeValue = null; 
 
-    // ALTERAÇÃO: Variáveis globais para receber os dados do banco
+    // Variáveis que recebem a configuração do painel admin
     let diasAtivos = [1, 2, 3, 4, 5, 6]; 
     let gradeHorarios = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
+    let gradeHorariosSabado = ["09:00", "10:00", "11:00", "12:00", "13:00"];
 
     function renderizarDatas() {
         if (!dateContainer) return;
@@ -118,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const dataFutura = new Date(hoje);
             dataFutura.setDate(hoje.getDate() + i);
             
-            // ALTERAÇÃO: Verifica se o dia da semana está na lista de dias ativos
             if (!diasAtivos.includes(dataFutura.getDay())) continue;
 
             const ano = dataFutura.getFullYear();
@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { collection, getDocs, query, where } = window.firestoreTools;
             const db = window.db;
 
+            // Busca os agendamentos já salvos no banco para este dia
             const q = query(
                 collection(db, "agendamentos"), 
                 where("data", "==", selectedDateValue)
@@ -173,8 +174,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             timeGrid.innerHTML = '';
             
-            // ALTERAÇÃO: Usa o array dinâmico em vez de um for fixo
-            gradeHorarios.forEach(timeString => {
+            // Verifica se a data selecionada é um Sábado
+            const partesData = selectedDateValue.split('-'); // Divide "2026-03-25"
+            const dataSelecionada = new Date(partesData[0], partesData[1] - 1, partesData[2]);
+            const ehSabado = dataSelecionada.getDay() === 6; // 6 representa Sábado no JS
+            
+            // Decide qual grade usar
+            const horariosParaUsar = ehSabado ? gradeHorariosSabado : gradeHorarios;
+
+            if (horariosParaUsar.length === 0) {
+                timeGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.7;">Nenhum horário disponível para este dia.</p>';
+                return;
+            }
+
+            horariosParaUsar.forEach(timeString => {
                 const button = document.createElement('div');
                 
                 if (horariosOcupados.includes(timeString)) {
@@ -285,7 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ======================================================
     // 5. INICIALIZAÇÃO DINÂMICA
     // ======================================================
-    // ALTERAÇÃO: Busca os dias e horários no Firebase antes de renderizar
     async function iniciarSite() {
         try {
             const { doc, getDoc } = window.firestoreTools;
@@ -296,6 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = snap.data();
                 if (data.dias_funcionamento) diasAtivos = data.dias_funcionamento;
                 if (data.horarios_base) gradeHorarios = data.horarios_base.sort();
+                if (data.horarios_sabado) gradeHorariosSabado = data.horarios_sabado.sort();
             }
         } catch(e) { 
             console.error("Erro config agenda:", e); 

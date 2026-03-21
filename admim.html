@@ -98,15 +98,29 @@
 
                 <hr style="border-color: var(--glass-border); margin: 2rem 0;">
 
-                <h2 style="font-family: 'Playfair Display'; margin-bottom: 0.5rem;">Grade de Horários Base</h2>
+                <h2 style="font-family: 'Playfair Display'; margin-bottom: 0.5rem;">Grade Padrão (Seg a Sex)</h2>
                 <form id="form-horarios" class="admin-form">
                     <div class="input-group">
-                        <label>Novo Horário</label>
+                        <label>Novo Horário Padrão</label>
                         <input type="time" id="novo-horario" required style="padding: 10px; border-radius: 5px;">
                     </div>
                     <button type="submit" class="btn-primary">Adicionar Horário</button>
                 </form>
                 <div id="lista-horarios" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.5rem;">
+                    <p>Carregando horários...</p>
+                </div>
+
+                <hr style="border-color: var(--glass-border); margin: 2rem 0;">
+
+                <h2 style="font-family: 'Playfair Display'; margin-bottom: 0.5rem;">Grade Especial (Sábados)</h2>
+                <form id="form-horarios-sab" class="admin-form">
+                    <div class="input-group">
+                        <label>Novo Horário para Sábado</label>
+                        <input type="time" id="novo-horario-sab" required style="padding: 10px; border-radius: 5px;">
+                    </div>
+                    <button type="submit" class="btn-primary">Adicionar Horário Sábado</button>
+                </form>
+                <div id="lista-horarios-sab" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.5rem;">
                     <p>Carregando horários...</p>
                 </div>
             </div>
@@ -116,19 +130,14 @@
 
     <script>
         function abrirAba(evento, idAba) {
-            // Esconde todas as abas
             const conteudos = document.getElementsByClassName("tab-content");
             for (let i = 0; i < conteudos.length; i++) {
                 conteudos[i].classList.remove("active");
             }
-            
-            // Remove a classe "active" de todos os botões do menu
             const botoes = document.getElementsByClassName("tab-btn");
             for (let i = 0; i < botoes.length; i++) {
                 botoes[i].classList.remove("active");
             }
-            
-            // Mostra a aba clicada e marca o botão correspondente
             document.getElementById(idAba).classList.add("active");
             evento.currentTarget.classList.add("active");
         }
@@ -138,7 +147,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // SUAS CREDENCIAIS DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBlsJiWRJ1GfKDyKu0AFVvUM4_3-4WuEes",
             authDomain: "amanda-nails-11f7b.firebaseapp.com",
@@ -264,26 +272,36 @@
         // ========================
         const docRefAgenda = doc(db, "configuracao", "agenda");
         let horariosAtuais = [];
+        let horariosSabado = [];
 
         async function carregarConfigAgenda() {
             try {
                 const snap = await getDoc(docRefAgenda);
                 if (snap.exists()) {
                     const data = snap.data();
+                    
+                    // Dias de funcionamento
                     const dias = data.dias_funcionamento || [];
                     document.querySelectorAll('.dia-chk').forEach(chk => {
                         chk.checked = dias.includes(Number(chk.value));
                     });
+                    
+                    // Grade Base
                     horariosAtuais = data.horarios_base || [];
-                    renderizarHorarios(horariosAtuais);
+                    renderizarHorarios(horariosAtuais, 'lista-horarios', 'base');
+
+                    // Grade Sabado
+                    horariosSabado = data.horarios_sabado || [];
+                    renderizarHorarios(horariosSabado, 'lista-horarios-sab', 'sabado');
                 } else {
-                    renderizarHorarios([]);
+                    renderizarHorarios([], 'lista-horarios', 'base');
+                    renderizarHorarios([], 'lista-horarios-sab', 'sabado');
                 }
             } catch (e) { console.error("Erro ao carregar agenda", e); }
         }
 
-        function renderizarHorarios(horarios) {
-            const container = document.getElementById('lista-horarios');
+        function renderizarHorarios(horarios, containerId, tipo) {
+            const container = document.getElementById(containerId);
             container.innerHTML = '';
             if (horarios.length === 0) {
                 container.innerHTML = '<p>Nenhum horário cadastrado.</p>';
@@ -292,11 +310,12 @@
             horarios.sort().forEach(h => {
                 const div = document.createElement('div');
                 div.style = "background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--accent-color); display: flex; align-items: center; gap: 10px;";
-                div.innerHTML = `<span style="font-weight: bold;">${h}</span> <i class="fas fa-times" style="color: #ff4d4d; cursor: pointer;" onclick="removerHorario('${h}')"></i>`;
+                div.innerHTML = `<span style="font-weight: bold;">${h}</span> <i class="fas fa-times" style="color: #ff4d4d; cursor: pointer;" onclick="removerHorario('${h}', '${tipo}')"></i>`;
                 container.appendChild(div);
             });
         }
 
+        // Salvar Dias
         document.getElementById('form-dias').onsubmit = async (e) => {
             e.preventDefault();
             const diasSelecionados = Array.from(document.querySelectorAll('.dia-chk:checked')).map(chk => Number(chk.value));
@@ -304,22 +323,42 @@
             alert('Dias atualizados com sucesso!');
         };
 
+        // Salvar Horário Base
         document.getElementById('form-horarios').onsubmit = async (e) => {
             e.preventDefault();
             const novo = document.getElementById('novo-horario').value;
             if (!horariosAtuais.includes(novo)) {
                 horariosAtuais.push(novo);
                 await setDoc(docRefAgenda, { horarios_base: horariosAtuais }, { merge: true });
-                renderizarHorarios(horariosAtuais);
+                renderizarHorarios(horariosAtuais, 'lista-horarios', 'base');
                 document.getElementById('novo-horario').value = '';
             }
         };
 
-        window.removerHorario = async (h) => {
+        // Salvar Horário Sábado
+        document.getElementById('form-horarios-sab').onsubmit = async (e) => {
+            e.preventDefault();
+            const novo = document.getElementById('novo-horario-sab').value;
+            if (!horariosSabado.includes(novo)) {
+                horariosSabado.push(novo);
+                await setDoc(docRefAgenda, { horarios_sabado: horariosSabado }, { merge: true });
+                renderizarHorarios(horariosSabado, 'lista-horarios-sab', 'sabado');
+                document.getElementById('novo-horario-sab').value = '';
+            }
+        };
+
+        // Função Única para Remover Horários
+        window.removerHorario = async (h, tipo) => {
             if(confirm(`Remover o horário ${h}?`)) {
-                horariosAtuais = horariosAtuais.filter(item => item !== h);
-                await setDoc(docRefAgenda, { horarios_base: horariosAtuais }, { merge: true });
-                renderizarHorarios(horariosAtuais);
+                if(tipo === 'base') {
+                    horariosAtuais = horariosAtuais.filter(item => item !== h);
+                    await setDoc(docRefAgenda, { horarios_base: horariosAtuais }, { merge: true });
+                    renderizarHorarios(horariosAtuais, 'lista-horarios', 'base');
+                } else {
+                    horariosSabado = horariosSabado.filter(item => item !== h);
+                    await setDoc(docRefAgenda, { horarios_sabado: horariosSabado }, { merge: true });
+                    renderizarHorarios(horariosSabado, 'lista-horarios-sab', 'sabado');
+                }
             }
         };
 
