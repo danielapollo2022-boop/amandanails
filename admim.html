@@ -7,73 +7,136 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css"> 
-    <style>
-        body { padding-top: 50px; }
-        .admin-container { max-width: 800px; margin: 0 auto; padding: 2rem; }
-        .service-item-admin { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 1rem; border-bottom: 1px solid var(--glass-border); 
-        }
-        .btn-delete { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
-        .admin-form { margin-bottom: 3rem; display: grid; gap: 10px; }
-        .admin-form input, .admin-form label { font-size: 1rem; }
-        .status-msg { text-align: center; margin: 10px 0; font-weight: bold; }
-    </style>
 </head>
 <body>
     <div class="bg-orb orb-1"></div>
     <div class="bg-orb orb-2"></div>
 
-    <div class="container admin-container glass-card">
+    <div class="admin-layout">
         
-        <h1 style="font-family: 'Playfair Display'; margin-bottom: 1rem;">Gerenciar Preços</h1>
-        
-        <form id="add-service-form" class="admin-form">
-            <div class="input-group">
-                <label>Nome do Serviço</label>
-                <input type="text" id="admin-nome" placeholder="Ex: Alongamento em Gel" required>
-            </div>
-            <div class="input-group">
-                <label>Preço (R$)</label>
-                <input type="text" id="admin-preco" placeholder="Ex: 150,00" required>
-            </div>
-            <div class="input-group">
-                <label>Ordem de exibição</label>
-                <input type="number" id="admin-ordem" placeholder="Ex: 1" required>
-            </div>
-            <div class="input-group" style="flex-direction: row; align-items: center; gap: 10px;">
-                <input type="checkbox" id="admin-popular" style="width: auto;">
-                <label for="admin-popular" style="margin: 0;">Marcar como "Popular"?</label>
-            </div>
-            <button type="submit" class="btn-primary">Adicionar Serviço</button>
-        </form>
+        <aside class="admin-sidebar glass-card">
+            <h2>Amanda Nails</h2>
+            <nav>
+                <button class="tab-btn active" onclick="abrirAba(event, 'aba-servicos')">
+                    <i class="fas fa-list"></i> Serviços
+                </button>
+                <button class="tab-btn" onclick="abrirAba(event, 'aba-galeria')">
+                    <i class="fas fa-images"></i> Galeria
+                </button>
+                <button class="tab-btn" onclick="abrirAba(event, 'aba-agenda')">
+                    <i class="fas fa-calendar-alt"></i> Grade & Dias
+                </button>
+                
+                <a href="index.html" class="btn-voltar">
+                    <i class="fas fa-arrow-left"></i> Ver Site
+                </a>
+            </nav>
+        </aside>
 
-        <h2>Serviços Atuais</h2>
-        <div id="admin-lista-servicos" style="margin-bottom: 3rem;">
-            <p>Carregando lista...</p>
-        </div>
+        <main class="admin-content">
 
-        <hr style="margin: 3rem 0; border-color: var(--glass-border);">
-        <h1 style="font-family: 'Playfair Display'; margin-bottom: 1rem;">Gerenciar Galeria</h1>
-        
-        <form id="add-photo-form" class="admin-form">
-            <div class="input-group">
-                <label>Selecione uma Imagem do Computador ou Celular</label>
-                <input type="file" id="admin-foto" accept="image/*" required style="padding: 10px; background: white; border-radius: 5px; color: black;">
+            <div id="aba-servicos" class="tab-content active glass-card">
+                <h1 class="section-header">Gerenciar Preços</h1>
+                
+                <form id="add-service-form" class="admin-form">
+                    <div class="input-group">
+                        <label>Nome do Serviço</label>
+                        <input type="text" id="admin-nome" placeholder="Ex: Alongamento em Gel" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Preço (R$)</label>
+                        <input type="text" id="admin-preco" placeholder="Ex: 150,00" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Ordem de exibição</label>
+                        <input type="number" id="admin-ordem" placeholder="Ex: 1" required>
+                    </div>
+                    <div class="input-group" style="flex-direction: row; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="admin-popular" style="width: auto;">
+                        <label for="admin-popular" style="margin: 0;">Marcar como "Popular"?</label>
+                    </div>
+                    <button type="submit" class="btn-primary">Adicionar Serviço</button>
+                </form>
+
+                <h2 style="margin-bottom: 1rem; font-family: 'Playfair Display';">Serviços Atuais</h2>
+                <div id="admin-lista-servicos">
+                    <p>Carregando lista...</p>
+                </div>
             </div>
-            <button type="submit" class="btn-primary" id="btn-upload-foto">Fazer Upload e Salvar</button>
-        </form>
 
-        <h2>Fotos Atuais da Galeria</h2>
-        <div id="admin-lista-fotos" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 3rem;">
-            <p>Carregando fotos...</p>
-        </div>
+            <div id="aba-galeria" class="tab-content glass-card">
+                <h1 class="section-header">Gerenciar Galeria</h1>
+                
+                <form id="add-photo-form" class="admin-form">
+                    <div class="input-group">
+                        <label>Selecione uma Imagem do Computador ou Celular</label>
+                        <input type="file" id="admin-foto" accept="image/*" required style="padding: 10px; background: rgba(255,255,255,0.5); border-radius: 5px; color: var(--text-color);">
+                    </div>
+                    <button type="submit" class="btn-primary" id="btn-upload-foto">Fazer Upload e Salvar</button>
+                </form>
 
+                <h2 style="margin-bottom: 1rem; font-family: 'Playfair Display';">Fotos Atuais da Galeria</h2>
+                <div id="admin-lista-fotos" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <p>Carregando fotos...</p>
+                </div>
+            </div>
+
+            <div id="aba-agenda" class="tab-content glass-card">
+                <h1 class="section-header">Gerenciar Grade e Dias</h1>
+                
+                <h2 style="font-family: 'Playfair Display'; margin-bottom: 0.5rem;">Dias de Funcionamento</h2>
+                <form id="form-dias" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 2rem;">
+                    <label><input type="checkbox" value="0" class="dia-chk"> Dom</label>
+                    <label><input type="checkbox" value="1" class="dia-chk"> Seg</label>
+                    <label><input type="checkbox" value="2" class="dia-chk"> Ter</label>
+                    <label><input type="checkbox" value="3" class="dia-chk"> Qua</label>
+                    <label><input type="checkbox" value="4" class="dia-chk"> Qui</label>
+                    <label><input type="checkbox" value="5" class="dia-chk"> Sex</label>
+                    <label><input type="checkbox" value="6" class="dia-chk"> Sáb</label>
+                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Atualizar Dias</button>
+                </form>
+
+                <hr style="border-color: var(--glass-border); margin: 2rem 0;">
+
+                <h2 style="font-family: 'Playfair Display'; margin-bottom: 0.5rem;">Grade de Horários Base</h2>
+                <form id="form-horarios" class="admin-form">
+                    <div class="input-group">
+                        <label>Novo Horário</label>
+                        <input type="time" id="novo-horario" required style="padding: 10px; border-radius: 5px;">
+                    </div>
+                    <button type="submit" class="btn-primary">Adicionar Horário</button>
+                </form>
+                <div id="lista-horarios" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.5rem;">
+                    <p>Carregando horários...</p>
+                </div>
+            </div>
+
+        </main>
     </div>
+
+    <script>
+        function abrirAba(evento, idAba) {
+            // Esconde todas as abas
+            const conteudos = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < conteudos.length; i++) {
+                conteudos[i].classList.remove("active");
+            }
+            
+            // Remove a classe "active" de todos os botões do menu
+            const botoes = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < botoes.length; i++) {
+                botoes[i].classList.remove("active");
+            }
+            
+            // Mostra a aba clicada e marca o botão correspondente
+            document.getElementById(idAba).classList.add("active");
+            evento.currentTarget.classList.add("active");
+        }
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // SUAS CREDENCIAIS DO FIREBASE
         const firebaseConfig = {
@@ -88,22 +151,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // ELEMENTOS DO DOM (SERVIÇOS)
+        // ========================
+        // 1. SERVIÇOS
+        // ========================
         const listaServicos = document.getElementById('admin-lista-servicos');
         const addServiceForm = document.getElementById('add-service-form');
-        
-        // ELEMENTOS DO DOM (GALERIA)
-        const addPhotoForm = document.getElementById('add-photo-form');
-        const fileInput = document.getElementById('admin-foto');
-        const btnUploadFoto = document.getElementById('btn-upload-foto');
-        const listaFotos = document.getElementById('admin-lista-fotos');
 
-        // SUA CHAVE DO IMGBB
-        const IMGBB_API_KEY = "c6a9c5e9ae0280d0c772312e48d2d18d";
-
-        // ========================
-        // 1. LÓGICA DE SERVIÇOS
-        // ========================
         async function carregarServicos() {
             listaServicos.innerHTML = '<p>Atualizando...</p>';
             const q = query(collection(db, "servicos"), orderBy("ordem", "asc"));
@@ -117,9 +170,9 @@
                 div.innerHTML = `
                     <div>
                         <strong>${data.nome}</strong> - R$ ${data.preco} 
-                        ${data.popular ? '<span class="badge">Popular</span>' : ''}
+                        ${data.popular ? '<span class="badge" style="background:var(--accent-color); color:#fff; padding:2px 8px; border-radius:10px; font-size:0.8rem;">Popular</span>' : ''}
                     </div>
-                    <button class="btn-delete" onclick="deletarItem('servicos', '${servico.id}')">Excluir</button>
+                    <button class="btn-delete" onclick="deletarItem('servicos', '${servico.id}')"><i class="fas fa-trash"></i> Excluir</button>
                 `;
                 listaServicos.appendChild(div);
             });
@@ -143,8 +196,14 @@
         };
 
         // ========================
-        // 2. LÓGICA DE GALERIA
+        // 2. GALERIA
         // ========================
+        const IMGBB_API_KEY = "c6a9c5e9ae0280d0c772312e48d2d18d";
+        const addPhotoForm = document.getElementById('add-photo-form');
+        const fileInput = document.getElementById('admin-foto');
+        const btnUploadFoto = document.getElementById('btn-upload-foto');
+        const listaFotos = document.getElementById('admin-lista-fotos');
+
         async function carregarFotos() {
             listaFotos.innerHTML = '<p>Atualizando...</p>';
             const q = query(collection(db, "galeria"), orderBy("data_upload", "desc"));
@@ -162,7 +221,7 @@
                 div.style = "position: relative; width: 120px; height: 120px;";
                 div.innerHTML = `
                     <img src="${data.url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px; border: 2px solid var(--accent-color);">
-                    <button class="btn-delete" onclick="deletarItem('galeria', '${fotoDoc.id}')" style="position: absolute; top: -10px; right: -10px; border-radius: 50%; padding: 5px 10px; font-weight: bold; cursor: pointer;">X</button>
+                    <button class="btn-delete" onclick="deletarItem('galeria', '${fotoDoc.id}')" style="position: absolute; top: -10px; right: -10px; border-radius: 50%; width: 30px; height: 30px; padding: 0; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"><i class="fas fa-times"></i></button>
                 `;
                 listaFotos.appendChild(div);
             });
@@ -180,22 +239,11 @@
             formData.append('image', file);
 
             try {
-                // Envia para o ImgBB
-                const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: 'POST',
-                    body: formData
-                });
+                const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
                 const imgbbData = await imgbbResponse.json();
 
                 if (imgbbData.success) {
-                    const imageUrl = imgbbData.data.url;
-
-                    // Salva no Firebase
-                    await addDoc(collection(db, "galeria"), {
-                        url: imageUrl,
-                        data_upload: new Date().toISOString()
-                    });
-
+                    await addDoc(collection(db, "galeria"), { url: imgbbData.data.url, data_upload: new Date().toISOString() });
                     addPhotoForm.reset();
                     carregarFotos();
                     alert("Foto adicionada à galeria com sucesso!");
@@ -204,7 +252,7 @@
                 }
             } catch (err) {
                 alert("O erro exato foi: " + err.message);
-                console.error("Erro completo:", err);
+                console.error(err);
             } finally {
                 btnUploadFoto.innerText = "Fazer Upload e Salvar";
                 btnUploadFoto.disabled = false;
@@ -212,7 +260,71 @@
         };
 
         // ========================
-        // 3. FUNÇÃO GLOBAL DELETAR
+        // 3. AGENDA (DIAS E HORÁRIOS)
+        // ========================
+        const docRefAgenda = doc(db, "configuracao", "agenda");
+        let horariosAtuais = [];
+
+        async function carregarConfigAgenda() {
+            try {
+                const snap = await getDoc(docRefAgenda);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const dias = data.dias_funcionamento || [];
+                    document.querySelectorAll('.dia-chk').forEach(chk => {
+                        chk.checked = dias.includes(Number(chk.value));
+                    });
+                    horariosAtuais = data.horarios_base || [];
+                    renderizarHorarios(horariosAtuais);
+                } else {
+                    renderizarHorarios([]);
+                }
+            } catch (e) { console.error("Erro ao carregar agenda", e); }
+        }
+
+        function renderizarHorarios(horarios) {
+            const container = document.getElementById('lista-horarios');
+            container.innerHTML = '';
+            if (horarios.length === 0) {
+                container.innerHTML = '<p>Nenhum horário cadastrado.</p>';
+                return;
+            }
+            horarios.sort().forEach(h => {
+                const div = document.createElement('div');
+                div.style = "background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--accent-color); display: flex; align-items: center; gap: 10px;";
+                div.innerHTML = `<span style="font-weight: bold;">${h}</span> <i class="fas fa-times" style="color: #ff4d4d; cursor: pointer;" onclick="removerHorario('${h}')"></i>`;
+                container.appendChild(div);
+            });
+        }
+
+        document.getElementById('form-dias').onsubmit = async (e) => {
+            e.preventDefault();
+            const diasSelecionados = Array.from(document.querySelectorAll('.dia-chk:checked')).map(chk => Number(chk.value));
+            await setDoc(docRefAgenda, { dias_funcionamento: diasSelecionados }, { merge: true });
+            alert('Dias atualizados com sucesso!');
+        };
+
+        document.getElementById('form-horarios').onsubmit = async (e) => {
+            e.preventDefault();
+            const novo = document.getElementById('novo-horario').value;
+            if (!horariosAtuais.includes(novo)) {
+                horariosAtuais.push(novo);
+                await setDoc(docRefAgenda, { horarios_base: horariosAtuais }, { merge: true });
+                renderizarHorarios(horariosAtuais);
+                document.getElementById('novo-horario').value = '';
+            }
+        };
+
+        window.removerHorario = async (h) => {
+            if(confirm(`Remover o horário ${h}?`)) {
+                horariosAtuais = horariosAtuais.filter(item => item !== h);
+                await setDoc(docRefAgenda, { horarios_base: horariosAtuais }, { merge: true });
+                renderizarHorarios(horariosAtuais);
+            }
+        };
+
+        // ========================
+        // 4. FUNÇÃO GLOBAL DE DELETAR
         // ========================
         window.deletarItem = async (colecao, id) => {
             if(confirm("Deseja realmente excluir este item?")) {
@@ -227,9 +339,10 @@
             }
         }
 
-        // Inicializar
+        // Inicializar todas as funções
         carregarServicos();
         carregarFotos();
+        carregarConfigAgenda();
     </script>
 </body>
 </html>

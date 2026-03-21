@@ -699,29 +699,28 @@ footer { margin-top: 4rem; }
     .shape-item span { font-size: 0.9rem; }
     
     /* --- INSTAGRAM MOBILE (CARROSSEL) --- */
-    /* Aqui acontece a mágica: transformamos a grade em um slider */
     .instagram-grid { 
         display: flex;
-        flex-wrap: nowrap !important; /* Força uma linha só */
-        overflow-x: auto; /* Permite rolar para o lado */
-        justify-content: flex-start; /* Alinha no começo */
-        padding-bottom: 10px; /* Espaço para o dedo não cobrir a foto */
-        -webkit-overflow-scrolling: touch; /* Rolagem suave no iPhone */
-        scroll-snap-type: x mandatory; /* Faz a foto "grudar" ao rolar */
+        flex-wrap: nowrap !important;
+        overflow-x: auto; 
+        justify-content: flex-start;
+        padding-bottom: 10px;
+        -webkit-overflow-scrolling: touch; 
+        scroll-snap-type: x mandatory; 
     }
 
     .insta-item {
-        width: 160px; /* Tamanho menor no celular */
+        width: 160px; 
         height: 160px;
-        scroll-snap-align: center; /* Centraliza a foto ao parar de rolar */
+        scroll-snap-align: center; 
         margin-right: 5px;
     }
     
-    /* Esconder a barra de rolagem (Visual mais limpo) */
     .instagram-grid::-webkit-scrollbar {
         display: none;
     }
 }
+
 .time-slot.ocupado {
     background: #ccc !important;
     color: #666 !important;
@@ -730,21 +729,20 @@ footer { margin-top: 4rem; }
     opacity: 0.6;
     text-decoration: line-through;
 }
-/* Container das datas com rolagem horizontal */
+
 .date-scroll-container {
     display: flex;
     overflow-x: auto;
     gap: 10px;
     padding-bottom: 10px;
-    scrollbar-width: none; /* Esconde barra de rolagem no Firefox */
-    -ms-overflow-style: none; /* Esconde no IE/Edge */
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
 }
 
 .date-scroll-container::-webkit-scrollbar {
-    display: none; /* Esconde no Chrome/Safari */
+    display: none; 
 }
 
-/* O cartãozinho de cada dia */
 .date-card {
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid var(--glass-border);
@@ -769,7 +767,6 @@ footer { margin-top: 4rem; }
     color: var(--accent-color);
 }
 
-/* Quando o dia é selecionado */
 .date-card.selected {
     background: var(--accent-color);
     border-color: var(--accent-color);
@@ -782,70 +779,236 @@ footer { margin-top: 4rem; }
     opacity: 1;
 }
 
-/* Dark mode ajuste */
 [data-theme="dark"] .date-card.selected strong {
     color: #1A1617;
 }
+
 .date-scroll-container {
     display: flex;
-    overflow-x: auto; /* Permite rolar para o lado */
+    overflow-x: auto; 
     gap: 12px;
     padding: 10px 5px;
-    width: 100%; /* Ocupa a largura total do formulário */
-    cursor: grab; /* Muda o cursor para uma 'mãozinha' no PC */
+    width: 100%; 
+    cursor: grab; 
     scroll-behavior: smooth;
-    
-    /* No PC, é melhor deixar a barra de rolagem visível ou fina para o usuário saber que dá para rolar */
     scrollbar-width: thin; 
     scrollbar-color: var(--accent-color) transparent;
 }
 
-/* Garante que os cards não 'esmaguem' no PC */
 .date-card {
-    flex-shrink: 0; /* IMPEDIR que o card diminua no PC */
-    width: 110px;   /* Largura fixa para ficar bonito */
+    flex-shrink: 0; 
+    width: 110px;   
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     padding: 15px 5px;
     transition: all 0.3s ease;
 }
-/* =========================================
-   ESCONDER BARRA DE ROLAGEM SÓ NO CELULAR
-   ========================================= */
 
-/* Aplica essas regras apenas para telas menores que 768px (celulares e tablets pequenos) */
 @media (max-width: 768px) {
     .date-scroll-container {
-        /* Esconde a barra de rolagem no Firefox */
         scrollbar-width: none; 
-        /* Esconde no Internet Explorer e Edge antigo */
         -ms-overflow-style: none; 
     }
-
-    /* Esconde a barra de rolagem no Chrome, Safari e Edge novo */
     .date-scroll-container::-webkit-scrollbar {
         display: none;
     }
 }
-/* =========================================
-   EFEITO DE CLIQUE NA GALERIA
-========================================= */
 
-/* Garante que a imagem respeite as bordas arredondadas do container */
 .insta-item.clickable-zoom {
-    border-radius: 15px; /* Ajuste este valor se suas bordas forem diferentes */
+    border-radius: 15px; 
     overflow: hidden;
-    cursor: pointer; /* Mostra a mãozinha ao passar o mouse */
-    transition: transform 0.2s ease-in-out; /* Suaviza a animação */
+    cursor: pointer; 
+    transition: transform 0.2s ease-in-out; 
 }
 
-/* O estado :active acontece enquanto o botão do mouse está pressionado */
 .insta-item.clickable-zoom:active {
-    transform: scale(1.05); /* Aumenta a imagem em 5% */
+    transform: scale(1.05); 
 }
 
-/* Opcional: Se quiser um efeito suave também ao passar o mouse (hover) */
 .insta-item.clickable-zoom:hover {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2); /* Sombra mais forte */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2); 
+}
+
+
+/* ==========================================================================
+   --- PAINEL ADMINISTRATIVO (admim.html) ---
+   ========================================================================== */
+
+.admin-layout { 
+    display: flex; 
+    gap: 30px; 
+    max-width: 1200px; 
+    margin: 80px auto 2rem auto; /* Espaço para o topo */
+    padding: 0 1.5rem; 
+    align-items: flex-start; 
+}
+
+/* Menu Lateral */
+.admin-sidebar { 
+    width: 280px; 
+    padding: 2rem; 
+    border-radius: 15px; 
+    position: sticky; 
+    top: 30px; 
+}
+
+.admin-sidebar h2 { 
+    font-family: 'Playfair Display', serif; 
+    margin-bottom: 2rem; 
+    font-size: 1.5rem; 
+    text-align: center; 
+    color: var(--text-color);
+}
+
+.tab-btn { 
+    display: block; 
+    width: 100%; 
+    text-align: left; 
+    background: none; 
+    border: 1px solid transparent; 
+    color: var(--text-color); 
+    padding: 12px 20px; 
+    margin-bottom: 10px; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-size: 1rem; 
+    transition: all 0.3s; 
+    font-family: 'Lato', sans-serif; 
+}
+
+.tab-btn i { width: 30px; }
+
+.tab-btn:hover { 
+    background: rgba(255, 255, 255, 0.1); 
+    border-color: var(--glass-border); 
+}
+
+.tab-btn.active { 
+    background: var(--accent-color); 
+    color: #fff; 
+    font-weight: bold; 
+    box-shadow: 0 4px 15px rgba(231, 184, 177, 0.4);
+}
+
+[data-theme="dark"] .tab-btn.active { color: #1A1617; }
+
+.btn-voltar { 
+    display: block; 
+    text-align: center; 
+    margin-top: 2rem; 
+    text-decoration: none; 
+    color: var(--text-color); 
+    border: 1px solid var(--accent-color); 
+    padding: 12px; 
+    border-radius: 10px; 
+    transition: all 0.3s; 
+    font-weight: bold;
+}
+
+.btn-voltar:hover { 
+    background: var(--accent-color); 
+    color: #fff; 
+}
+
+[data-theme="dark"] .btn-voltar:hover { color: #1A1617; }
+
+/* Área de Conteúdo */
+.admin-content { 
+    flex: 1; 
+    width: 100%;
+}
+
+.tab-content { 
+    padding: 2.5rem; 
+    border-radius: 15px; 
+    display: none; 
+    animation: fadeIn 0.4s ease-out; 
+}
+
+.tab-content.active { display: block; }
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* Estilos Internos do Painel */
+.service-item-admin { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 1rem; 
+    border-bottom: 1px solid var(--glass-border); 
+}
+
+.btn-delete { 
+    background: #ff4d4d; 
+    color: white; 
+    border: none; 
+    padding: 6px 12px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    transition: background 0.2s;
+}
+
+.btn-delete:hover { background: #e60000; }
+
+.admin-form { 
+    margin-bottom: 2rem; 
+    display: grid; 
+    gap: 15px; 
+}
+
+.admin-form input, .admin-form label { font-size: 1rem; }
+
+.section-header { 
+    font-family: 'Playfair Display', serif; 
+    margin-bottom: 1.5rem; 
+    font-size: 2rem; 
+    color: var(--text-color); 
+    border-bottom: 2px solid var(--glass-border); 
+    padding-bottom: 10px;
+}
+
+/* Responsividade do Painel Admin */
+@media (max-width: 900px) {
+    .admin-layout { 
+        flex-direction: column; 
+        padding-top: 20px;
+    }
+    
+    .admin-sidebar { 
+        width: 100%; 
+        position: static; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        padding: 1.5rem; 
+    }
+    
+    .admin-sidebar nav { 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 10px; 
+        justify-content: center; 
+        width: 100%; 
+    }
+    
+    .tab-btn { 
+        width: auto; 
+        margin-bottom: 0; 
+        padding: 10px 15px; 
+    }
+    
+    .btn-voltar { width: 100%; }
+    
+    .tab-content { padding: 1.5rem; }
+    
+    .service-item-admin { 
+        flex-direction: column; 
+        gap: 10px; 
+        text-align: center; 
+    }
 }

@@ -104,6 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedDateVisual = null; 
     let selectedTimeValue = null; 
 
+    // ALTERAÇÃO: Variáveis globais para receber os dados do banco
+    let diasAtivos = [1, 2, 3, 4, 5, 6]; 
+    let gradeHorarios = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
+
     function renderizarDatas() {
         if (!dateContainer) return;
         dateContainer.innerHTML = ''; 
@@ -113,7 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; diasGerados < 10; i++) {
             const dataFutura = new Date(hoje);
             dataFutura.setDate(hoje.getDate() + i);
-            if (dataFutura.getDay() === 0) continue;
+            
+            // ALTERAÇÃO: Verifica se o dia da semana está na lista de dias ativos
+            if (!diasAtivos.includes(dataFutura.getDay())) continue;
 
             const ano = dataFutura.getFullYear();
             const mes = (dataFutura.getMonth() + 1).toString().padStart(2, '0');
@@ -166,11 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
             querySnapshot.forEach((doc) => horariosOcupados.push(doc.data().horario));
 
             timeGrid.innerHTML = '';
-            const startHour = 9;
-            const endHour = 19;
-
-            for (let hour = startHour; hour <= endHour; hour++) {
-                const timeString = `${hour.toString().padStart(2, '0')}:00`;
+            
+            // ALTERAÇÃO: Usa o array dinâmico em vez de um for fixo
+            gradeHorarios.forEach(timeString => {
                 const button = document.createElement('div');
                 
                 if (horariosOcupados.includes(timeString)) {
@@ -190,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
                 timeGrid.appendChild(button);
-            }
+            });
         } catch (error) {
             console.error("Erro ao carregar agenda:", error);
             timeGrid.innerHTML = '<p style="color: red;">Erro ao conectar com a agenda.</p>';
@@ -212,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const dadosAgendamento = {
                 nome: document.getElementById('name').value,
-                // Limpeza do telefone para o link wa.me funcionar
                 telefone: document.getElementById('phone').value.replace(/\D/g, ''), 
                 servico: document.getElementById('service').value,
                 data: selectedDateValue,       
@@ -222,8 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                // IDs ATUALIZADOS: service_91l5vat e rk870vp (da sua foto)
-                // Veja que trocamos 'rk870vp' por 'template_tnodhe4'
                 await emailjs.send('service_91l5vat', 'template_tnodhe4', dadosAgendamento);
                 
                 const { collection, addDoc } = window.firestoreTools;
@@ -281,11 +282,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Inicialização
-    renderizarDatas();     
-    setTimeout(carregarAgendaDoDia, 500); 
-    carregarTabelaPrecos(); 
-    carregarGaleria();
+    // ======================================================
+    // 5. INICIALIZAÇÃO DINÂMICA
+    // ======================================================
+    // ALTERAÇÃO: Busca os dias e horários no Firebase antes de renderizar
+    async function iniciarSite() {
+        try {
+            const { doc, getDoc } = window.firestoreTools;
+            const docRef = doc(window.db, "configuracao", "agenda");
+            const snap = await getDoc(docRef);
+            
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.dias_funcionamento) diasAtivos = data.dias_funcionamento;
+                if (data.horarios_base) gradeHorarios = data.horarios_base.sort();
+            }
+        } catch(e) { 
+            console.error("Erro config agenda:", e); 
+        }
+
+        renderizarDatas();     
+        setTimeout(carregarAgendaDoDia, 500); 
+        carregarTabelaPrecos(); 
+        carregarGaleria();
+    }
+
+    iniciarSite();
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {

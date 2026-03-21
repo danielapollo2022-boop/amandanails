@@ -229,7 +229,8 @@
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      // Alteração: doc, getDoc, setDoc adicionados
+      import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBlsJiWRJ1GfKDyKu0AFVvUM4_3-4WuEes",
@@ -244,7 +245,8 @@
       const db = getFirestore(app);
 
       window.db = db;
-      window.firestoreTools = { collection, addDoc, getDocs, query, where, orderBy };
+      // Alteração: doc, getDoc, setDoc exportados para o script.js
+      window.firestoreTools = { collection, addDoc, getDocs, query, where, orderBy, doc, getDoc, setDoc };
     </script>
 
     <script src="script.js"></script>
